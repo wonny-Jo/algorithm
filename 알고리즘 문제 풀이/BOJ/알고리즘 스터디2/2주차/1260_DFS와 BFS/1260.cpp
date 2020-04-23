@@ -1,82 +1,97 @@
 #include<iostream>
-#include<algorithm>
-#include<vector>
 #include<queue>
-#include<stack>
-using namespace std;
 
-void BFS(vector<int> data[1001], bool BFS_check[1001], int start)
+#define RECURDFS 1
+#if !RECURDFS
+#include<stack>
+#endif
+
+using namespace std;
+bool arr[1001][1001] = { 0 };
+bool visitBFS[1001] = { 0 };
+bool visitDFS[1001] = { 0 };
+int N, M, V;
+
+void bfs(int start)
 {
+	visitBFS[start] = 1;
 	queue<int> q;
 	q.push(start);
-	BFS_check[start] = true;
 
 	while (!q.empty())
 	{
 		int x = q.front();
 		q.pop();
 		cout << x << ' ';
-		int size = data[x].size();
-		for (int i = 0; i < size; ++i)
+
+		for (int i = 1; i <= N; i++)
 		{
-			int y = data[x][i];
-			if (!BFS_check[y]) {
-				q.push(y);
-				BFS_check[y] = true;
+			if (!visitBFS[i] && arr[x][i])
+			{
+				visitBFS[i] = 1;
+				q.push(i);
 			}
 		}
 	}
-	cout << endl;
+	cout << '\n';
 }
 
-void DFS(vector<int> data[1001], bool DFS_check[1001], int start)
+
+#if !RECURDFS
+void dfs(int start)
 {
+	visitDFS[start] = 1;
 	stack<int> s;
 	s.push(start);
-	DFS_check[start] = true;
 	cout << start << ' ';
 	while (!s.empty())
 	{
 		int x = s.top();
 		s.pop();
-		int size = data[x].size();
-		for (int i = 0; i < size; ++i)
+		for (int i = 1; i <= N; ++i)
 		{
-			int y = data[x][i];
-			if (!DFS_check[y])
+			if (!visitDFS[i] && arr[x][i])
 			{
-				cout << y << ' ';
-				DFS_check[y] = true;
+				visitDFS[i] = 1;
+				cout << i << ' ';
 				s.push(x);
-				s.push(y);
+				s.push(i);
 				break;
 			}
 		}
 	}
-	cout << endl;
+	cout << '\n';
 }
-
+#else
+void dfs(int start)
+{
+	visitDFS[start] = 1;
+	cout << start << ' ';
+	for (int i = 1; i <= N; ++i)
+		if (!visitDFS[i] && arr[start][i])
+			dfs(i);
+}
+#endif
 
 int main()
 {
-	vector<int> data[1001];
-	int N, M, V;
+	cin.tie(0);
+	cin.sync_with_stdio(0);
+	cout.tie(0);
+
 	cin >> N >> M >> V;
-	int a, b;
-	for (int i = 0; i < M; ++i)
+	for (int i = 0; i < M; i++)
 	{
-		cin >> a >> b;
-		data[a].push_back(b);
-		data[b].push_back(a);
+		int a, b; cin >> a >> b;
+		arr[a][b] = 1;
+		arr[b][a] = 1;
 	}
-	for (int i = 1; i <= N; ++i)
-		sort(data[i].begin(), data[i].end());
-	bool DFS_check[1001] = { 0 };
-	bool BFS_check[1001] = { 0 };
+	dfs(V);	
+#if RECURDFS
+	cout << '\n';
+#endif
 
-	DFS(data, DFS_check, V);
-	BFS(data, BFS_check, V);
-
-
+	bfs(V);
+	
 	return 0;
 }
